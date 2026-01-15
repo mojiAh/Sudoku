@@ -1,6 +1,8 @@
 export type Cell = {
   given: number | null;
   value: number | null;
+  notes?: Set<number>;
+  isConflicted?: boolean;
 };
 
 export type Board = Cell[];

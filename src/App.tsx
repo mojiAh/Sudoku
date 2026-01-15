@@ -6,7 +6,7 @@ import type { Board } from "./engine/types";
 import "./App.css";
 
 function App() {
-  const [board, setBoard] = useState<Board>(() => parsePuzzle(PUZZLES[0]));
+  const [board] = useState<Board>(() => parsePuzzle(PUZZLES[0]));
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

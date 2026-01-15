@@ -1,14 +1,13 @@
 import type { Board } from "./types";
 
 export function parsePuzzle(puzzle: string): Board {
-  const board: Board = [];
-  if (puzzle.length !== 81) throw new Error("Size of puzzle is 81");
+  if (puzzle.length !== 81) throw new Error("Puzzle must be 81 characters");
 
-  for (const character of puzzle) {
-    const digit = Number(character);
-    if (digit === 0) board.push({ given: null, value: null });
-    board.push({ given: digit, value: digit });
-  }
-
-  return board;
+  return [...puzzle].map((ch) => {
+    const d = Number(ch);
+    if (!Number.isInteger(d) || d < 0 || d > 9) {
+      throw new Error(`Invalid character: "${ch}"`);
+    }
+    return d === 0 ? { given: null, value: null } : { given: d, value: d };
+  });
 }

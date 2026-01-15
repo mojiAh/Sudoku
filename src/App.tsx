@@ -1,7 +1,21 @@
-import "./App.css";
+import { useState } from "react";
+import { SudokuBoard } from "./ui/SudokuBoard";
+import { parsePuzzle } from "./engine/parse";
+import { PUZZLES } from "./engine/puzzles";
+import type { Board } from "./engine/types";
 
 function App() {
-  return <></>;
+  const [board, setBoard] = useState<Board>(() => parsePuzzle(PUZZLES[0]));
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  return (
+    <div className="">
+      <SudokuBoard
+        board={board}
+        selectedIndex={selectedIndex}
+        onSelect={setSelectedIndex}
+      />
+    </div>
+  );
 }
 
 export default App;

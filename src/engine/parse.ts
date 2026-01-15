@@ -1,6 +1,6 @@
 import type { Board } from "./types";
 
-function parsePuzzle(puzzle: string): Board {
+export function parsePuzzle(puzzle: string): Board {
   const board: Board = [];
   if (puzzle.length !== 81) throw new Error("Size of puzzle is 81");
 

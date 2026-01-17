@@ -3,7 +3,6 @@ import { SudokuBoard } from "./ui/SudokuBoard";
 import { parsePuzzle } from "./engine/parse";
 import { PUZZLES } from "./engine/puzzles";
 import type { Board } from "./engine/types";
-import "./App.css";
 
 function App() {
   const [board] = useState<Board>(() => parsePuzzle(PUZZLES[0]));

@@ -33,8 +33,7 @@ export function gameReducer(state: GameState, action: Action): GameState {
     }
 
     default: {
-      const _exhaustive: never = action;
-      return state;
+      throw new Error("Unhandled action in reducer");
     }
   }
 }

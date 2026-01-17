@@ -6,6 +6,7 @@ type Props = {
   isSelected: boolean;
   isRelated: boolean;
   isSameValue: boolean;
+  isConflict: boolean;
   onSelect: (i: number) => void;
   className?: string;
 };
@@ -15,6 +16,7 @@ export const SudokuCell = ({
   isSelected,
   isRelated,
   isSameValue,
+  isConflict,
   onSelect,
   className = "",
 }: Props) => {
@@ -22,19 +24,27 @@ export const SudokuCell = ({
 
   const bgClass = isSelected
     ? "bg-blue-200"
-    : isSameValue
-    ? "bg-blue-100"
-    : isRelated
-    ? "bg-gray-100"
+    : isConflict
+      ? "bg-red-100"
+      : isSameValue
+        ? "bg-blue-100"
+        : isRelated
+          ? "bg-gray-100"
+          : isGiven
+            ? "bg-gray-50"
+            : "bg-white";
+
+  const textClass = isConflict
+    ? "text-red-700"
     : isGiven
-    ? "bg-gray-50"
-    : "bg-white";
+      ? "font-semibold text-gray-900"
+      : "text-gray-700";
 
   const hoverClass = isSelected
     ? "hover:bg-blue-200"
     : isGiven
-    ? "hover:bg-gray-100"
-    : "hover:bg-gray-50";
+      ? "hover:bg-gray-100"
+      : "hover:bg-gray-50";
 
   return (
     <button
@@ -47,11 +57,11 @@ export const SudokuCell = ({
         "select-none",
         className,
 
-        isGiven ? "font-semibold text-gray-900" : "text-gray-700",
         isGiven ? "cursor-default" : "cursor-pointer",
 
         bgClass,
         hoverClass,
+        textClass,
 
         "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset",
       ].join(" ")}

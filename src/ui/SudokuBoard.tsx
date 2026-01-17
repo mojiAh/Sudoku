@@ -1,3 +1,4 @@
+import { getConflictedIndices } from "../engine/conflicts";
 import type { Board } from "../engine/types";
 import { SudokuCell } from "./SudokuCell";
 
@@ -21,13 +22,15 @@ const isSameBox = (a: number, b: number) => {
 };
 
 export const SudokuBoard = ({ board, selectedIndex, onSelect }: Props) => {
+  const conflicts = getConflictedIndices(board);
+
   const selectedValue =
     selectedIndex !== null ? board[selectedIndex]?.value : null;
   return (
     <div className="grid grid-cols-9 border-2 border-gray-900 bg-white shadow-sm">
       {board.map((cell, index) => {
-        const row = Math.floor(index / 9);
-        const col = index % 9;
+        const row = rowOf(index);
+        const col = colOf(index);
 
         const isSelected = selectedIndex === index;
 
@@ -49,13 +52,14 @@ export const SudokuBoard = ({ board, selectedIndex, onSelect }: Props) => {
 
         const isRelated =
           selectedIndex !== null &&
+          index !== selectedIndex &&
           (rowOf(selectedIndex) === row ||
             colOf(selectedIndex) === col ||
             isSameBox(selectedIndex, index));
 
         const isSameValue =
           selectedValue !== null &&
-          selectedValue !== 0 &&
+          index !== selectedIndex &&
           cell.value === selectedValue;
 
         return (
@@ -66,6 +70,7 @@ export const SudokuBoard = ({ board, selectedIndex, onSelect }: Props) => {
             isSelected={isSelected}
             isRelated={isRelated}
             isSameValue={isSameValue}
+            isConflict={conflicts.has(index)}
             onSelect={onSelect}
             className={borderClasses}
           />

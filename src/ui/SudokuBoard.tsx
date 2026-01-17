@@ -9,7 +9,7 @@ type Props = {
 
 export const SudokuBoard = ({ board, selectedIndex, onSelect }: Props) => {
   return (
-    <div className="grid grid-cols-9 border-2 border-gray-900 bg-white">
+    <div className="grid grid-cols-9 border-2 border-gray-900 bg-white shadow-sm">
       {board.map((cell, index) => {
         const row = Math.floor(index / 9);
         const col = index % 9;

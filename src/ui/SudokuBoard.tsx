@@ -1,5 +1,5 @@
 import type { Board } from "../engine/types";
-import { SudokuCell } from "./Cell";
+import { SudokuCell } from "./SudokuCell";
 
 type Props = {
   board: Board;
@@ -7,7 +7,22 @@ type Props = {
   onSelect: (index: number) => void;
 };
 
+const rowOf = (i: number): number => Math.floor(i / 9);
+const colOf = (i: number): number => i % 9;
+
+const boxStart = (n: number) => Math.floor(n / 3) * 3;
+const isSameBox = (a: number, b: number) => {
+  const ra = rowOf(a),
+    ca = colOf(a);
+  const rb = rowOf(b),
+    cb = colOf(b);
+
+  return boxStart(ra) === boxStart(rb) && boxStart(ca) === boxStart(cb);
+};
+
 export const SudokuBoard = ({ board, selectedIndex, onSelect }: Props) => {
+  const selectedValue =
+    selectedIndex !== null ? board[selectedIndex]?.value : null;
   return (
     <div className="grid grid-cols-9 border-2 border-gray-900 bg-white shadow-sm">
       {board.map((cell, index) => {
@@ -32,12 +47,25 @@ export const SudokuBoard = ({ board, selectedIndex, onSelect }: Props) => {
           thickBottom ? "border-b-2 border-b-gray-900" : "",
         ].join(" ");
 
+        const isRelated =
+          selectedIndex !== null &&
+          (rowOf(selectedIndex) === row ||
+            colOf(selectedIndex) === col ||
+            isSameBox(selectedIndex, index));
+
+        const isSameValue =
+          selectedValue !== null &&
+          selectedValue !== 0 &&
+          cell.value === selectedValue;
+
         return (
           <SudokuCell
             key={index}
             index={index}
             cell={cell}
             isSelected={isSelected}
+            isRelated={isRelated}
+            isSameValue={isSameValue}
             onSelect={onSelect}
             className={borderClasses}
           />

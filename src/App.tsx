@@ -32,7 +32,13 @@ function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [state.selectedIndex]);
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div
+      className="min-h-screen flex items-center justify-center bg-gray-100"
+      onMouseDown={(e) => {
+        if ((e.target as HTMLElement).closest("[data-sudoku-board]")) return;
+        dispatch({ type: "SELECT_CELL", index: null });
+      }}
+    >
       <div className="flex flex-col items-center gap-4">
         <SudokuBoard
           board={state.board}

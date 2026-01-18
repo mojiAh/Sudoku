@@ -1,14 +1,22 @@
-import { useEffect, useMemo, useReducer, useRef } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { SudokuBoard } from "./ui/SudokuBoard";
-import { parsePuzzle } from "./engine/parse";
-import { PUZZLES } from "./engine/puzzles";
+import { PUZZLES, type Difficulty, type Puzzle } from "./engine/puzzles";
 import { gameReducer, initialGameState } from "./state/gameReducer";
+import { GameControls } from "./ui/GameControls";
+
+const getRandomPuzzle = (difficulty: Difficulty): Puzzle => {
+  const filtered = PUZZLES.filter((p) => (p.difficulty = difficulty));
+  return filtered[Math.floor(Math.random() * filtered.length)];
+};
 
 function App() {
-  const initialBoard = useMemo(() => parsePuzzle(PUZZLES[0]), []);
+  const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+
+  const initialPuzzle = useMemo(() => getRandomPuzzle(difficulty), []);
+
   const [state, dispatch] = useReducer(
     gameReducer,
-    initialGameState(initialBoard),
+    initialGameState(initialPuzzle.puzzle),
   );
 
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -32,6 +40,12 @@ function App() {
       dispatch({ type: "SET_CELL_VALUE", index: idx, value: Number(key) });
     }
   };
+
+  const startNewGame = () => {
+    const puzzle = getRandomPuzzle(difficulty);
+    dispatch({ type: "LOAD_PUZZLE", puzzle: puzzle.puzzle });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <input
@@ -51,6 +65,12 @@ function App() {
         }}
       />
       <div className="flex flex-col items-center gap-4">
+        <GameControls
+          difficulty={difficulty}
+          onDifficultyChange={setDifficulty}
+          onNewGame={startNewGame}
+          onReset={() => dispatch({ type: "RESET" })}
+        />
         <SudokuBoard
           board={state.board}
           selectedIndex={state.selectedIndex}

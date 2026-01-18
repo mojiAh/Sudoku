@@ -1,19 +1,33 @@
-import type { Board, GameState } from "../engine/types";
+import { parsePuzzle } from "../engine/parse";
+import type { GameState } from "../engine/types";
 
 export type Action =
-  | { type: "LOAD_PUZZLE"; board: Board }
+  | { type: "RESET" }
+  | { type: "LOAD_PUZZLE"; puzzle: string }
   | { type: "SELECT_CELL"; index: number | null }
   | { type: "SET_CELL_VALUE"; index: number; value: number | null };
 
-export const initialGameState = (board: Board): GameState => ({
-  board,
-  selectedIndex: null,
-});
+export const initialGameState = (puzzle: string): GameState => {
+  const board = parsePuzzle(puzzle);
+  return {
+    board,
+    initialBoard: board,
+    selectedIndex: null,
+  };
+};
 
 export function gameReducer(state: GameState, action: Action): GameState {
   switch (action.type) {
     case "LOAD_PUZZLE": {
-      return { board: action.board, selectedIndex: null };
+      const board = parsePuzzle(action.puzzle);
+      return { board, initialBoard: board, selectedIndex: null };
+    }
+    case "RESET": {
+      return {
+        ...state,
+        board: state.initialBoard,
+        selectedIndex: null,
+      };
     }
     case "SELECT_CELL": {
       return { ...state, selectedIndex: action.index };

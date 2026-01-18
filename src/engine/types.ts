@@ -9,5 +9,6 @@ export type Board = Cell[];
 
 export type GameState = {
   board: Board;
+  initialBoard: Board;
   selectedIndex: number | null;
 };

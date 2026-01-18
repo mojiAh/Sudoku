@@ -24,7 +24,7 @@ export const SudokuCell = ({
 
   const bgClass = isSelected
     ? "bg-blue-200"
-    : isConflict
+    : isConflict && !isGiven
       ? "bg-red-100"
       : isSameValue
         ? "bg-blue-100"
@@ -34,11 +34,12 @@ export const SudokuCell = ({
             ? "bg-gray-50"
             : "bg-white";
 
-  const textClass = isConflict
-    ? "text-red-700"
-    : isGiven
-      ? "font-semibold text-gray-900"
-      : "text-gray-700";
+  const textClass =
+    isConflict && !isGiven
+      ? "text-red-700"
+      : isGiven
+        ? "font-semibold text-gray-900"
+        : "text-gray-700";
 
   const hoverClass = isSelected
     ? "hover:bg-blue-200"

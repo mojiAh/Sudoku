@@ -3,6 +3,7 @@ import { SudokuBoard } from "./ui/SudokuBoard";
 import { PUZZLES, type Difficulty, type Puzzle } from "./engine/puzzles";
 import { gameReducer, initialGameState } from "./state/gameReducer";
 import { GameControls } from "./ui/GameControls";
+import { NumberPad } from "./ui/NumberPad";
 
 const getRandomPuzzle = (difficulty: Difficulty): Puzzle => {
   const filtered = PUZZLES.filter((p) => (p.difficulty = difficulty));
@@ -20,6 +21,17 @@ function App() {
   );
 
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const selected = state.selectedIndex;
+  const clearCell = () => {
+    if (selected !== null)
+      dispatch({ type: "SET_CELL_VALUE", index: selected, value: null });
+  };
+
+  const setNumber = (num: number) => {
+    if (selected !== null)
+      dispatch({ type: "SET_CELL_VALUE", index: selected, value: Number(num) });
+  };
 
   useEffect(() => {
     if (state.selectedIndex !== null) {
@@ -78,6 +90,11 @@ function App() {
             dispatch({ type: "SELECT_CELL", index });
             requestAnimationFrame(() => inputRef.current?.focus());
           }}
+        />
+        <NumberPad
+          onClear={clearCell}
+          onNumber={setNumber}
+          disabled={state.selectedIndex === null}
         />
         <div className="text-sm text-gray-600">
           Click a cell, then type 1–9. Backspace/Delete clears.

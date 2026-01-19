@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { SudokuBoard } from "./ui/SudokuBoard";
 import { PUZZLES, type Difficulty, type Puzzle } from "./engine/puzzles";
 import { gameReducer, initialGameState } from "./state/gameReducer";
@@ -6,51 +6,30 @@ import { GameControls } from "./ui/GameControls";
 import { NumberPad } from "./ui/NumberPad";
 
 const getRandomPuzzle = (difficulty: Difficulty): Puzzle => {
-  const filtered = PUZZLES.filter((p) => (p.difficulty = difficulty));
+  const filtered = PUZZLES.filter((p) => p.difficulty === difficulty);
   return filtered[Math.floor(Math.random() * filtered.length)];
 };
 
 function App() {
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
-
-  const initialPuzzle = useMemo(() => getRandomPuzzle(difficulty), []);
-
+  const initialPuzzle = useMemo(
+    () => getRandomPuzzle(difficulty),
+    [difficulty],
+  );
   const [state, dispatch] = useReducer(
     gameReducer,
     initialGameState(initialPuzzle.puzzle),
   );
-
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
   const selected = state.selectedIndex;
+
   const clearCell = () => {
-    if (selected !== null)
-      dispatch({ type: "SET_CELL_VALUE", index: selected, value: null });
+    if (selected === null) return;
+    dispatch({ type: "SET_CELL_VALUE", index: selected, value: null });
   };
 
   const setNumber = (num: number) => {
-    if (selected !== null)
-      dispatch({ type: "SET_CELL_VALUE", index: selected, value: Number(num) });
-  };
-
-  useEffect(() => {
-    if (state.selectedIndex !== null) {
-      inputRef.current?.focus();
-    }
-  }, [state.selectedIndex]);
-
-  const handleKey = (key: string) => {
-    const idx = state.selectedIndex;
-    if (idx === null) return;
-
-    if (key === "Backspace" || key === "Delete") {
-      dispatch({ type: "SET_CELL_VALUE", index: idx, value: null });
-      return;
-    }
-
-    if (/^[1-9]$/.test(key)) {
-      dispatch({ type: "SET_CELL_VALUE", index: idx, value: Number(key) });
-    }
+    if (selected === null) return;
+    dispatch({ type: "SET_CELL_VALUE", index: selected, value: Number(num) });
   };
 
   const startNewGame = () => {
@@ -58,25 +37,34 @@ function App() {
     dispatch({ type: "LOAD_PUZZLE", puzzle: puzzle.puzzle });
   };
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const idx = state.selectedIndex;
+      if (idx === null) return;
+
+      if (e.key === "Backspace" || e.key === "Delete") {
+        dispatch({ type: "SET_CELL_VALUE", index: idx, value: null });
+        return;
+      }
+
+      if (/^[1-9]$/.test(e.key)) {
+        dispatch({ type: "SET_CELL_VALUE", index: idx, value: Number(e.key) });
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [state.selectedIndex, dispatch]);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-      <input
-        ref={inputRef}
-        inputMode="numeric"
-        pattern="[1-9]*"
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck={false}
-        className="absolute opacity-0 pointer-events-none h-0 w-0"
-        onKeyDown={(e) => handleKey(e.key)}
-        onChange={(e) => {
-          const v = e.target.value;
-          const last = v.slice(-1);
-          if (last) handleKey(last);
-          e.target.value = "";
-        }}
-      />
-      <div className="flex flex-col items-center gap-4">
+    <div
+      className="min-h-screen flex items-center justify-center bg-gray-100 p-6"
+      onMouseDown={(e) => {
+        if ((e.target as HTMLElement).closest("[data-sudoku-board]")) return;
+        dispatch({ type: "SELECT_CELL", index: null });
+      }}
+    >
+      <div data-sudoku-board className="flex flex-col items-center gap-4">
         <GameControls
           difficulty={difficulty}
           onDifficultyChange={setDifficulty}
@@ -88,13 +76,15 @@ function App() {
           selectedIndex={state.selectedIndex}
           onSelect={(index) => {
             dispatch({ type: "SELECT_CELL", index });
-            requestAnimationFrame(() => inputRef.current?.focus());
           }}
         />
         <NumberPad
           onClear={clearCell}
           onNumber={setNumber}
-          disabled={state.selectedIndex === null}
+          disabled={
+            state.selectedIndex === null ||
+            state.board[state.selectedIndex].given !== null
+          }
         />
         <div className="text-sm text-gray-600">
           Click a cell, then type 1–9. Backspace/Delete clears.

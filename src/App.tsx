@@ -7,6 +7,7 @@ import { NumberPad } from "./ui/NumberPad";
 
 const getRandomPuzzle = (difficulty: Difficulty): Puzzle => {
   const filtered = PUZZLES.filter((p) => p.difficulty === difficulty);
+  if (filtered.length === 0) return PUZZLES[0];
   return filtered[Math.floor(Math.random() * filtered.length)];
 };
 

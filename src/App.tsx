@@ -50,6 +50,17 @@ function App() {
       if (/^[1-9]$/.test(e.key)) {
         dispatch({ type: "SET_CELL_VALUE", index: idx, value: Number(e.key) });
       }
+
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === "z") {
+          dispatch({ type: "UNDO" });
+          e.preventDefault();
+        }
+        if (e.key === "y") {
+          dispatch({ type: "REDO" });
+          e.preventDefault();
+        }
+      }
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -70,6 +81,10 @@ function App() {
           onDifficultyChange={setDifficulty}
           onNewGame={startNewGame}
           onReset={() => dispatch({ type: "RESET" })}
+          onUndo={() => dispatch({ type: "UNDO" })}
+          onRedo={() => dispatch({ type: "REDO" })}
+          isUndoDisabled={state.past.length === 0}
+          isRedoDisabled={state.future.length === 0}
         />
         <SudokuBoard
           board={state.board}

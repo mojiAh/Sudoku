@@ -8,7 +8,9 @@ export type Cell = {
 export type Board = Cell[];
 
 export type GameState = {
+  past: Board[];
   board: Board;
+  future: Board[];
   initialBoard: Board;
   selectedIndex: number | null;
 };

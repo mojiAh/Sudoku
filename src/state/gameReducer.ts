@@ -9,7 +9,8 @@ export type Action =
   | { type: "SET_CELL_VALUE"; index: number; value: number | null }
   | { type: "UNDO" }
   | { type: "REDO" }
-  | { type: "TICK" };
+  | { type: "TICK" }
+  | { type: "TOGGLE_PAUSE" };
 
 export const initialGameState = (puzzle: string): GameState => {
   const board = parsePuzzle(puzzle);
@@ -20,6 +21,7 @@ export const initialGameState = (puzzle: string): GameState => {
     initialBoard: board,
     selectedIndex: null,
     elapsedTime: 0,
+    isPaused: false,
   };
 };
 
@@ -34,6 +36,7 @@ export function gameReducer(state: GameState, action: Action): GameState {
         initialBoard: board,
         selectedIndex: null,
         elapsedTime: 0,
+        isPaused: false,
       };
     }
     case "RESET": {
@@ -44,12 +47,14 @@ export function gameReducer(state: GameState, action: Action): GameState {
         future: [],
         selectedIndex: null,
         elapsedTime: 0,
+        isPaused: false,
       };
     }
     case "RESET_TIMER": {
       return {
         ...state,
         elapsedTime: 0,
+        isPaused: false,
       };
     }
     case "SELECT_CELL": {
@@ -107,7 +112,13 @@ export function gameReducer(state: GameState, action: Action): GameState {
         elapsedTime: state.elapsedTime + 1,
       };
     }
-
+    case "TOGGLE_PAUSE": {
+      return {
+        ...state,
+        isPaused: !state.isPaused,
+        selectedIndex: null,
+      };
+    }
     default: {
       throw new Error("Unhandled action in reducer");
     }

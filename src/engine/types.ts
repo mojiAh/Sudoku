@@ -14,4 +14,5 @@ export type GameState = {
   initialBoard: Board;
   selectedIndex: number | null;
   elapsedTime: number;
+  isPaused: boolean;
 };

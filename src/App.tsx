@@ -41,6 +41,8 @@ function App() {
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (state.isPaused) return;
+
       const idx = state.selectedIndex;
       if (idx === null) return;
 
@@ -70,6 +72,7 @@ function App() {
   }, [state.selectedIndex, dispatch]);
 
   useEffect(() => {
+    if (state.isPaused) return;
     let interval: number | null = null;
 
     const start = () => {
@@ -97,7 +100,7 @@ function App() {
       stop();
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, []);
+  }, [state.isPaused]);
 
   return (
     <div
@@ -118,20 +121,27 @@ function App() {
           isUndoDisabled={state.past.length === 0}
           isRedoDisabled={state.future.length === 0}
         />
-        <GameTimer seconds={state.elapsedTime} />
-        <SudokuBoard
-          board={state.board}
-          selectedIndex={state.selectedIndex}
-          onSelect={(index) => {
-            dispatch({ type: "SELECT_CELL", index });
-          }}
+        <GameTimer
+          seconds={state.elapsedTime}
+          onTogglePause={() => dispatch({ type: "TOGGLE_PAUSE" })}
+          isPaused={state.isPaused}
         />
+        <div className={state.isPaused ? "blur-sm pointer-events-none" : ""}>
+          <SudokuBoard
+            board={state.board}
+            selectedIndex={state.selectedIndex}
+            onSelect={(index) => {
+              dispatch({ type: "SELECT_CELL", index });
+            }}
+          />
+        </div>
         <NumberPad
           onClear={clearCell}
           onNumber={setNumber}
           disabled={
             state.selectedIndex === null ||
-            state.board[state.selectedIndex].given !== null
+            state.board[state.selectedIndex].given !== null ||
+            state.isPaused
           }
         />
         <div className="text-sm text-gray-600">

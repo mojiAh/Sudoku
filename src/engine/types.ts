@@ -13,4 +13,5 @@ export type GameState = {
   future: Board[];
   initialBoard: Board;
   selectedIndex: number | null;
+  elapsedTime: number;
 };

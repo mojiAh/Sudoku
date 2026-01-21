@@ -4,6 +4,7 @@ import { PUZZLES, type Difficulty, type Puzzle } from "./engine/puzzles";
 import { gameReducer, initialGameState } from "./state/gameReducer";
 import { GameControls } from "./ui/GameControls";
 import { NumberPad } from "./ui/NumberPad";
+import { GameTimer } from "./ui/GameTimer";
 
 const getRandomPuzzle = (difficulty: Difficulty): Puzzle => {
   const filtered = PUZZLES.filter((p) => p.difficulty === difficulty);
@@ -68,6 +69,36 @@ function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [state.selectedIndex, dispatch]);
 
+  useEffect(() => {
+    let interval: number | null = null;
+
+    const start = () => {
+      if (interval === null) {
+        interval = window.setInterval(() => {
+          dispatch({ type: "TICK" });
+        }, 1000);
+      }
+    };
+    const stop = () => {
+      if (interval !== null) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    start();
+
+    const onVisibilityChange = () => {
+      document.hidden ? stop() : start();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, []);
+
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-gray-100 p-6"
@@ -87,6 +118,7 @@ function App() {
           isUndoDisabled={state.past.length === 0}
           isRedoDisabled={state.future.length === 0}
         />
+        <GameTimer seconds={state.elapsedTime} />
         <SudokuBoard
           board={state.board}
           selectedIndex={state.selectedIndex}

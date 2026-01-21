@@ -3,11 +3,13 @@ import type { GameState } from "../engine/types";
 
 export type Action =
   | { type: "RESET" }
+  | { type: "RESET_TIMER" }
   | { type: "LOAD_PUZZLE"; puzzle: string }
   | { type: "SELECT_CELL"; index: number | null }
   | { type: "SET_CELL_VALUE"; index: number; value: number | null }
   | { type: "UNDO" }
-  | { type: "REDO" };
+  | { type: "REDO" }
+  | { type: "TICK" };
 
 export const initialGameState = (puzzle: string): GameState => {
   const board = parsePuzzle(puzzle);
@@ -17,6 +19,7 @@ export const initialGameState = (puzzle: string): GameState => {
     future: [],
     initialBoard: board,
     selectedIndex: null,
+    elapsedTime: 0,
   };
 };
 
@@ -30,6 +33,7 @@ export function gameReducer(state: GameState, action: Action): GameState {
         future: [],
         initialBoard: board,
         selectedIndex: null,
+        elapsedTime: 0,
       };
     }
     case "RESET": {
@@ -39,6 +43,13 @@ export function gameReducer(state: GameState, action: Action): GameState {
         past: [],
         future: [],
         selectedIndex: null,
+        elapsedTime: 0,
+      };
+    }
+    case "RESET_TIMER": {
+      return {
+        ...state,
+        elapsedTime: 0,
       };
     }
     case "SELECT_CELL": {
@@ -88,6 +99,12 @@ export function gameReducer(state: GameState, action: Action): GameState {
         board: next,
         future: rest,
         selectedIndex: null,
+      };
+    }
+    case "TICK": {
+      return {
+        ...state,
+        elapsedTime: state.elapsedTime + 1,
       };
     }
 

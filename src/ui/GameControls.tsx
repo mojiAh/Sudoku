@@ -13,8 +13,10 @@ type Props = {
   onReset: () => void;
   onUndo: () => void;
   onRedo: () => void;
+  onToggleNoteMode: () => void;
   isUndoDisabled: boolean;
   isRedoDisabled: boolean;
+  isNoteMode: boolean;
 };
 export const GameControls = ({
   difficulty,
@@ -23,8 +25,10 @@ export const GameControls = ({
   onReset,
   onUndo,
   onRedo,
+  onToggleNoteMode,
   isUndoDisabled,
   isRedoDisabled,
+  isNoteMode,
 }: Props) => {
   return (
     <div className="flex items-center gap-3 justify-between w-full">
@@ -65,6 +69,15 @@ export const GameControls = ({
 
         <button onClick={onNewGame} className={controlBtnBase} title="New Game">
           🆕
+        </button>
+        <button
+          onClick={onToggleNoteMode}
+          className={[
+            "w-12 h-12 rounded-xl flex items-center justify-center text-xl",
+            isNoteMode ? "bg-yellow-300" : "bg-gray-200 hover:bg-gray-300",
+          ].join(" ")}
+        >
+          ✏️
         </button>
       </div>
     </div>

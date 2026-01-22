@@ -8,6 +8,8 @@ export function parsePuzzle(puzzle: string): Board {
     if (!Number.isInteger(d) || d < 0 || d > 9) {
       throw new Error(`Invalid character: "${ch}"`);
     }
-    return d === 0 ? { given: null, value: null } : { given: d, value: d };
+    return d === 0
+      ? { given: null, value: null, notes: [] }
+      : { given: d, value: d, notes: [] };
   });
 }

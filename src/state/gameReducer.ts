@@ -10,7 +10,9 @@ export type Action =
   | { type: "UNDO" }
   | { type: "REDO" }
   | { type: "TICK" }
-  | { type: "TOGGLE_PAUSE" };
+  | { type: "TOGGLE_PAUSE" }
+  | { type: "TOGGLE_NOTE_MODE" }
+  | { type: "TOGGLE_NOTE"; index: number; value: number };
 
 export const initialGameState = (puzzle: string): GameState => {
   const board = parsePuzzle(puzzle);
@@ -22,6 +24,7 @@ export const initialGameState = (puzzle: string): GameState => {
     selectedIndex: null,
     elapsedTime: 0,
     isPaused: false,
+    isNoteMode: false,
   };
 };
 
@@ -37,6 +40,7 @@ export function gameReducer(state: GameState, action: Action): GameState {
         selectedIndex: null,
         elapsedTime: 0,
         isPaused: false,
+        isNoteMode: false,
       };
     }
     case "RESET": {
@@ -48,6 +52,7 @@ export function gameReducer(state: GameState, action: Action): GameState {
         selectedIndex: null,
         elapsedTime: 0,
         isPaused: false,
+        isNoteMode: false,
       };
     }
     case "RESET_TIMER": {
@@ -64,13 +69,10 @@ export function gameReducer(state: GameState, action: Action): GameState {
       const { value, index } = action;
 
       const cell = state.board[index];
-      if (!cell) return state;
-
-      if (cell.given !== null) return state;
-      if (cell.value === value) return state;
+      if (!cell || cell.given !== null || cell.value === value) return state;
 
       const nextBoard = [...state.board];
-      nextBoard[index] = { ...cell, value };
+      nextBoard[index] = { ...cell, value, notes: [] };
 
       return {
         ...state,
@@ -112,11 +114,37 @@ export function gameReducer(state: GameState, action: Action): GameState {
         elapsedTime: state.elapsedTime + 1,
       };
     }
+    case "TOGGLE_NOTE_MODE": {
+      return {
+        ...state,
+        isNoteMode: !state.isNoteMode,
+      };
+    }
     case "TOGGLE_PAUSE": {
       return {
         ...state,
         isPaused: !state.isPaused,
         selectedIndex: null,
+      };
+    }
+    case "TOGGLE_NOTE": {
+      const { value, index } = action;
+
+      const cell = state.board[index];
+      if (!cell || cell.given || cell.value !== null) return state;
+
+      const notes = cell.notes.includes(value)
+        ? cell.notes.filter((n) => n !== value)
+        : [...cell.notes, value].sort();
+
+      const nextBoard = [...state.board];
+      nextBoard[index] = { ...cell, notes };
+
+      return {
+        ...state,
+        past: [...state.past, state.board],
+        board: nextBoard,
+        future: [],
       };
     }
     default: {

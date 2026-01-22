@@ -1,7 +1,7 @@
 export type Cell = {
   given: number | null;
   value: number | null;
-  notes?: Set<number>;
+  notes: number[];
   isConflicted?: boolean;
 };
 
@@ -15,4 +15,5 @@ export type GameState = {
   selectedIndex: number | null;
   elapsedTime: number;
   isPaused: boolean;
+  isNoteMode: boolean;
 };

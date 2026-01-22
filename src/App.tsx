@@ -31,7 +31,12 @@ function App() {
 
   const setNumber = (num: number) => {
     if (selected === null) return;
-    dispatch({ type: "SET_CELL_VALUE", index: selected, value: Number(num) });
+
+    if (state.isNoteMode) {
+      dispatch({ type: "TOGGLE_NOTE", index: selected, value: Number(num) });
+    } else {
+      dispatch({ type: "SET_CELL_VALUE", index: selected, value: Number(num) });
+    }
   };
 
   const startNewGame = () => {
@@ -52,7 +57,19 @@ function App() {
       }
 
       if (/^[1-9]$/.test(e.key)) {
-        dispatch({ type: "SET_CELL_VALUE", index: idx, value: Number(e.key) });
+        if (state.isNoteMode) {
+          dispatch({
+            type: "TOGGLE_NOTE",
+            index: idx,
+            value: Number(e.key),
+          });
+        } else {
+          dispatch({
+            type: "SET_CELL_VALUE",
+            index: idx,
+            value: Number(e.key),
+          });
+        }
       }
 
       if (e.ctrlKey || e.metaKey) {
@@ -118,8 +135,10 @@ function App() {
           onReset={() => dispatch({ type: "RESET" })}
           onUndo={() => dispatch({ type: "UNDO" })}
           onRedo={() => dispatch({ type: "REDO" })}
+          onToggleNoteMode={() => dispatch({ type: "TOGGLE_NOTE_MODE" })}
           isUndoDisabled={state.past.length === 0}
           isRedoDisabled={state.future.length === 0}
+          isNoteMode={state.isNoteMode}
         />
         <GameTimer
           seconds={state.elapsedTime}

@@ -67,7 +67,19 @@ export const SudokuCell = ({
         "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset",
       ].join(" ")}
     >
-      {cell.value ?? ""}
+      {cell.value !== null ? (
+        cell.value
+      ) : cell.notes.length > 0 ? (
+        <div className="grid grid-cols-3 gap-[1px] text-[10px] leading-none text-gray-500">
+          {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => (
+            <span key={n} className="text-center">
+              {cell.notes.includes(n) ? n : ""}
+            </span>
+          ))}
+        </div>
+      ) : (
+        ""
+      )}
     </button>
   );
 };

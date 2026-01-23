@@ -1,4 +1,5 @@
 import { parsePuzzle } from "../engine/parse";
+import { arePeers } from "../engine/peers";
 import type { GameState } from "../engine/types";
 
 export type Action =
@@ -71,8 +72,28 @@ export function gameReducer(state: GameState, action: Action): GameState {
       const cell = state.board[index];
       if (!cell || cell.given !== null || cell.value === value) return state;
 
-      const nextBoard = [...state.board];
-      nextBoard[index] = { ...cell, value, notes: [] };
+      const nextBoard = state.board.map((c, i) => {
+        if (i === index) {
+          return {
+            ...c,
+            value,
+            notes: [],
+          };
+        }
+
+        if (
+          value !== null &&
+          !c.given &&
+          c.value === null &&
+          arePeers(index, i)
+        ) {
+          return {
+            ...c,
+            notes: c.notes.filter((n) => n !== value),
+          };
+        }
+        return c;
+      });
 
       return {
         ...state,

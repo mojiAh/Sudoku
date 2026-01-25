@@ -1,24 +1,12 @@
 import { getConflictedIndices } from "../engine/conflicts";
 import type { Board } from "../engine/types";
 import { SudokuCell } from "./SudokuCell";
+import { rowOf, colOf, arePeers } from "../engine/peers";
 
 type Props = {
   board: Board;
   selectedIndex: number | null;
   onSelect: (index: number) => void;
-};
-
-const rowOf = (i: number): number => Math.floor(i / 9);
-const colOf = (i: number): number => i % 9;
-
-const boxStart = (n: number) => Math.floor(n / 3) * 3;
-const isSameBox = (a: number, b: number) => {
-  const ra = rowOf(a),
-    ca = colOf(a);
-  const rb = rowOf(b),
-    cb = colOf(b);
-
-  return boxStart(ra) === boxStart(rb) && boxStart(ca) === boxStart(cb);
 };
 
 export const SudokuBoard = ({ board, selectedIndex, onSelect }: Props) => {
@@ -43,6 +31,14 @@ export const SudokuBoard = ({ board, selectedIndex, onSelect }: Props) => {
 
           const isSelected = selectedIndex === index;
 
+          const isRelated =
+            selectedIndex !== null && arePeers(selectedIndex, index);
+
+          const isSameValue =
+            selectedValue !== null &&
+            index !== selectedIndex &&
+            cell.value === selectedValue;
+
           const thickLeft = col % 3 === 0;
           const thickTop = row % 3 === 0;
           const thickRight = col === 8;
@@ -58,18 +54,6 @@ export const SudokuBoard = ({ board, selectedIndex, onSelect }: Props) => {
             thickRight ? "border-r-2 border-r-gray-900" : "",
             thickBottom ? "border-b-2 border-b-gray-900" : "",
           ].join(" ");
-
-          const isRelated =
-            selectedIndex !== null &&
-            index !== selectedIndex &&
-            (rowOf(selectedIndex) === row ||
-              colOf(selectedIndex) === col ||
-              isSameBox(selectedIndex, index));
-
-          const isSameValue =
-            selectedValue !== null &&
-            index !== selectedIndex &&
-            cell.value === selectedValue;
 
           return (
             <SudokuCell
